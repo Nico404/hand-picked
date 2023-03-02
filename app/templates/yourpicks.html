@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Sortable JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<!-- Sortable functon -->
+<script src="../static/js/list_channels.js" defer></script>
+
+<div class="bg-white-100">
+    <section class="container mx-auto">
+        <section class="p-10 h-screen">
+            <div class="py-2">
+                <h4 class="text-3xl font-extrabold capitalize text-green-500">
+                    Your Picks
+                </h4>
+                <p>Curate your list and make your favorite channels rise to the top.</p>
+                <p>Order, add your personal
+                    notes to make your friends want to them check out </p>
+                <form class="flex items-center pt-5">
+                    <label for="voice-search" class="sr-only">Search</label>
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor"
+                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <input type="text"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Filter through channels" required>
+                    </div>
+
+            </div>
+            <!-- table container -->
+            <section class="my-5">
+                <div class="flex flex-col">
+                    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:px-8">
+                        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                            <div class="overflow-hidden shadow-md bg-white rounded-lg">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                #
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                Channel
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                Label
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                Created In
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                Views
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <!-- Table Body -->
+                                    <tbody class="bg-white" id="list_item">
+                                        {% for subscription in data %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                01
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <img class="h-10 w-10 rounded-full object-cover"
+                                                            src="{{ subscription.snippet.thumbnails.default.url }}"
+                                                            alt="{{ subscription.snippet.title }}">
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-700 capitalize">
+                                                            {{ subscription.snippet.title }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-700 capitalize">TBD</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
+                                                    {{ '-'.join(subscription.snippet.publishedAt[:10].split('-')) }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-purple-700 capitalize">
+                                                    TBD</span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+
+
+                                        <!-- Table Card#1 
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                01
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <img class="h-10 w-10 rounded-full object-cover"
+                                                            src="./img/the-weekend.jpg" alt="the-weekend">
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-700 capitalize">
+                                                            Pray for me
+                                                        </div>
+                                                        <div class="text-xs text-gray-400 capitalize">
+                                                            The Weekend
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-700 capitalize">Black Panther</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm text-gray-600 leading-5 px-2 inline-flex">4:39</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-purple-700 capitalize">1.8 Bilion</span>
+                                            </td>
+                                        </tr>-->
+                                        <!-- Table Card#2 
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                02
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <img class="h-10 w-10 rounded-full object-cover"
+                                                            src="./img/ed-shreen.jpg" alt="ed-shreen">
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-700 capitalize">
+                                                            Perfect
+                                                        </div>
+                                                        <div class="text-xs text-gray-400 capitalize">
+                                                            ed sheeran
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-700 capitalize">divide</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm text-gray-600 leading-5 px-2 inline-flex">3:29</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-purple-700 capitalize">2.7 Bilion</span>
+                                            </td>
+                                        </tr>-->
+
+                                        <!-- Table Card#3 
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                03
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <img class="h-10 w-10 rounded-full object-cover"
+                                                            src="./img/luis-fonsi.jpg" alt="luis-fonsi">
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-700 capitalize">
+                                                            despacito
+                                                        </div>
+                                                        <div class="text-xs text-gray-400 capitalize">
+                                                            luis fonsi
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-700 capitalize">vida</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm text-gray-600 leading-5 px-2 inline-flex">4:41</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-purple-700 capitalize">7.2 Bilion</span>
+                                            </td>
+                                        </tr>-->
+
+                                        <!-- Table Card#4
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                04
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <img class="h-10 w-10 rounded-full object-cover"
+                                                            src="./img/marshmello.jpg" alt="marshmello">
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-700 capitalize">
+                                                            alone
+                                                        </div>
+                                                        <div class="text-xs text-gray-400 capitalize">
+                                                            marshmello
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-700 capitalize">alone (the remixes)</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm text-gray-600 leading-5 px-2 inline-flex">3:39</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-purple-700 capitalize">2.0 Bilion</span>
+                                            </td>
+                                        </tr>-->
+
+                                        <!-- Table Card#5
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                05
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <img class="h-10 w-10 rounded-full object-cover"
+                                                            src="./img/jb.jpg" alt="justin-bieber">
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-700 capitalize">
+                                                            sorry
+                                                        </div>
+                                                        <div class="text-xs text-gray-400 capitalize">
+                                                            justin bieber
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-700 capitalize">purpose</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="text-sm text-gray-600 leading-5 px-2 inline-flex">3:25</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-purple-700 capitalize">3.4 Bilion</span>
+                                            </td>
+                                        </tr>-->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+
+
+
+
+
+    {% endblock %}
