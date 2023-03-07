@@ -30,7 +30,7 @@
     aria-label="Sidebar">
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
       <a href="#" class="flex items-center pl-2.5 mb-5">
-        <span class="self-center text-2xl font-bold whitespace-nowrap dark:text-green-600">Hand-Picked</span>
+        <span class="self-center text-2xl font-extrabold whitespace-nowrap text-green-600 dark:text-green-600">Hand-Picked</span>
       </a>
       <ul class="space-y-2">
         {% if current_user.is_authenticated %}
@@ -47,7 +47,7 @@
           </a>
         </li>
         <li>
-          <a href="#"
+          <a href="{{ url_for('main.yourpicks') }}"
             class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
@@ -79,8 +79,17 @@
             <span class="flex-1 ml-3 whitespace-nowrap">Dashboard</span>
           </a>
         </li>
-
-        <div class="absolute bottom-0 flex">
+          <div class="absolute bottom-14 flex">
+            <li class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white">
+                <span class="flex-1 ml-3 whitespace-nowrap">Signed in as</span>
+            </li>
+            <li class="flex items-center p-2 text-base font-bold text-green-500 rounded-lg dark:text-green-500"> 
+                <span class="flex-1 ml-3 whitespace-nowrap">{{ current_user.username }}</span>
+              </a>
+            </li>
+          </div>
+  
+          <div class="absolute bottom-2 flex">
           <li>
             <a href="#"
               class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -92,7 +101,6 @@
               <span class="flex-1 ml-3 whitespace-nowrap">Support</span>
             </a>
           </li>
-          <li>
           <li>
             <a href="{{ url_for('auth.signout') }}"
               class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -201,6 +209,7 @@
 
     </div>
   </div>
+
 </body>
 
 </html>

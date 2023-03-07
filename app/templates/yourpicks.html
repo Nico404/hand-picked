@@ -4,7 +4,7 @@
 <!-- Sortable JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <!-- Sortable functon -->
-<script src="../static/js/list_channels.js" defer></script>
+<!-- <script src="../static/js/list_channels.js" defer></script> -->
 
 <div class="bg-white-100">
     <section class="container mx-auto">
@@ -43,54 +43,35 @@
                                     <thead>
                                         <tr>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
-                                                #
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
                                                 Channel
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
-                                                Label
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
-                                                Created In
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
-                                                Views
+                                                Subscription Date
                                             </th>
                                         </tr>
                                     </thead>
                                     <!-- Table Body -->
                                     <tbody class="bg-white" id="list_item">
-                                        {% for subscription in data %}
+                                        {% for subscription in subscriptions %}
                                         <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                01
-                                            </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-10 w-10">
                                                         <img class="h-10 w-10 rounded-full object-cover"
-                                                            src="{{ subscription.snippet.thumbnails.default.url }}"
-                                                            alt="{{ subscription.snippet.title }}">
+                                                            src="{{ subscription.thumbnail_default_url }}"
+                                                            alt="{{ subscription.title }}">
                                                     </div>
                                                     <div class="ml-4">
                                                         <div class="text-sm font-medium text-gray-700 capitalize">
-                                                            {{ subscription.snippet.title }}
+                                                            {{ subscription.title }}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-700 capitalize">TBD</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ '-'.join(subscription.snippet.publishedAt[:10].split('-')) }}
+                                                    {{ subscription.published_at.strftime('%d/%m/%Y') }}
                                                 </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="text-sm text-purple-700 capitalize">
-                                                    TBD</span>
                                             </td>
                                         </tr>
                                         {% endfor %}

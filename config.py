@@ -1,4 +1,8 @@
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 class Config:
     SECRET_KEY = "SECRET_KEY"
-    SQLALCHEMY_DATABASE_URI = "sqlite:////Users/nicoco/Developer/python/handpicked/backend/handpicked.db"  # F UUUUUUUUUUUUUUUUUUUUUUU
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'backend/handpicked.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False

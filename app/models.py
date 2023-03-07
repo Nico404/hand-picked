@@ -9,10 +9,10 @@ class Channel(db.Model):
     thumbnail_default_url = db.Column(db.String(255))
     thumbnail_medium_url = db.Column(db.String(255))
     thumbnail_high_url = db.Column(db.String(255))
-    country = db.Column(db.String(2))
-    view_count = db.Column(db.Integer)
-    subscriber_count = db.Column(db.Integer)
-    video_count = db.Column(db.Integer)
+    country = db.Column(db.String(2), nullable=True)
+    view_count = db.Column(db.Integer, nullable=True)
+    subscriber_count = db.Column(db.Integer, nullable=True)
+    video_count = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):
         return self.title
