@@ -8,11 +8,10 @@ from app.auth.models import User
 
 def get_youtube_object(user):
     # Retrieve the user's YouTube credentials from the database
-    user_id = user.user_id
-    user = User.query.filter_by(user_id=user_id).first()
+    user = User.query.filter_by(user_id=user.user_id).first()
     credentials_info = json.loads(user.youtube_credentials)
     credentials = Credentials.from_authorized_user_info(credentials_info)
 
-    # Build the YouTube API client using the credentials
+    # Build the Youtube object using the credentials
     youtube = build("youtube", "v3", credentials=credentials)
     return youtube

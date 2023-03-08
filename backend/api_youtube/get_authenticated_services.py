@@ -23,6 +23,7 @@ def flow(current_user):
         redirect_uri=url_for("main.index", _external=True),
     )
     credentials = flow.run_local_server(port=8081)
+
     # store the credentials in the database
     current_user.youtube_credentials = json.dumps(
         {
@@ -31,6 +32,10 @@ def flow(current_user):
         }
     )
     current_user.update_youtube_credentials(credentials)
+
+    # close the popup window using JavaScript
+    js = "window.opener.close(); window.close();"
+    return f"<script>{js}</script>"
 
 
 def get_authenticated_credentials(current_user):

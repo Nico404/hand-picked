@@ -16,3 +16,13 @@ class Channel(db.Model):
 
     def __repr__(self):
         return self.title
+
+
+class UserChannel(db.Model):
+    user_channel_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+    channel_id = db.Column(db.String(32), db.ForeignKey("channel.channel_id"))
+    flag_is_visible = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f"{self.user_id} - {self.channel_id}"

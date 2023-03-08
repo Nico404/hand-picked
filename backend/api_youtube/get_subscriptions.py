@@ -35,5 +35,5 @@ def get_subscriptions(current_user):
             print(f"An error occurred: {error}")
             return None
     print(subscriptions)
-    save_channels(subscriptions)
+    save_channels(subscriptions, current_user.user_id)
     return subscriptions
