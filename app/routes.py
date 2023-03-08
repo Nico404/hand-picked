@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app.models import Channel, UserChannel
 from backend.api_youtube.get_subscriptions import get_subscriptions
@@ -12,8 +12,8 @@ def index():
     return render_template("index.html", title="Home")
 
 
-# TODO: add login_required decorator
 @main_bp.route("/yourpicks")
+@login_required
 def yourpicks():
     if current_user.is_authenticated and current_user.youtube_credentials:
         # Get all the UserChannel objects that belong to the current user and are visible
@@ -34,5 +34,6 @@ def yourpicks():
 
 
 @main_bp.route("/support")
+@login_required
 def support():
-    return render_template("support.html", title="Support")
+    return render_template("support.html", email=current_user.email)
