@@ -1,5 +1,7 @@
 from flask import Flask
 from flask.cli import FlaskGroup
+
+# from flask_mailgun import MailGun
 from flask_migrate import Migrate
 
 from app.auth.routes import auth_bp, login_manager
@@ -25,6 +27,11 @@ def create_app(config_class=Config):
     # init login manager
     login_manager.init_app(app)
 
+    # init mail instance
+    # mailgun = MailGun()
+    # mailgun.init_app(app)
+
+    print(Config.MAILGUN_API_KEY)
     # custom cli command to create database
     @app.cli.command("create_database")
     def create_database():
