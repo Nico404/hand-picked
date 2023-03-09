@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 
 from app.models import Channel, UserChannel
 from backend.api_youtube.get_subscriptions import get_subscriptions
+from backend.api_youtube.get_youtube_object import get_youtube_object
 
 main_bp = Blueprint("main", __name__)
 

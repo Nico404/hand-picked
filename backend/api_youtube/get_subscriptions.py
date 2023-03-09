@@ -19,7 +19,10 @@ def get_subscriptions(current_user):
             subscriptions_response = (
                 youtube.subscriptions()
                 .list(
-                    part="snippet", mine=True, maxResults=50, pageToken=next_page_token
+                    part="snippet",
+                    mine=True,
+                    maxResults=50,
+                    pageToken=next_page_token,
                 )
                 .execute()
             )
