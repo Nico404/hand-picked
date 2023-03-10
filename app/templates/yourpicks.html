@@ -44,6 +44,15 @@
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
                                                 Subscription Date
                                             </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                View Count
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                Subscribers
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                Total Videos
+                                            </th>
                                         </tr>
                                     </thead>
                                     <!-- Table Body -->
@@ -67,6 +76,21 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
                                                     {{ subscription.published_at.strftime('%d/%m/%Y') }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
+                                                    {{ "{:,}".format(subscription.view_count).replace(",", " ") }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
+                                                    {{ "{:,}".format(subscription.subscriber_count).replace(",", " ") }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
+                                                    {{ "{:,}".format(subscription.video_count).replace(",", " ") }}
                                                 </span>
                                             </td>
                                         </tr>

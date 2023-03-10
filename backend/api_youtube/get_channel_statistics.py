@@ -1,13 +1,21 @@
 from sqlalchemy import text
 
+from app.auth.models import User
 from backend.api_youtube.get_youtube_object import get_youtube_object
 from backend.database import db
 
 
-def get_channel_statistics(current_user, channel_id):
+def get_channel_statistics(user_id, channel_id):
     """Fetches the channel statistics for the provided channel ID."""
+
+    # Fetch the authenticated user object
+    current_user = db.session.query(User).get(user_id)
+    if not current_user:
+        raise ValueError(f"User with ID {user_id} does not exist.")
+
     # Get the authenticated client object
     youtube = get_youtube_object(current_user)
+    print(current_user, channel_id, youtube)
 
     try:
         # Fetch the channel statistics using the provided channel ID.
@@ -26,15 +34,24 @@ def get_channel_statistics(current_user, channel_id):
         video_count = int(
             channel_statistics_response["items"][0]["statistics"]["videoCount"]
         )
+        print(channel_statistics_response)
+        print(view_count, subscriber_count, video_count)
 
         # Update the corresponding row in the channel table with the new statistics.
-        update_query = f"""
-            UPDATE channel
-            SET view_count = {view_count}, subscriber_count = {subscriber_count}, video_count = {video_count}
-            WHERE channel_id = '{channel_id}'
-        """
-        db.session.execute(update_query)
+        update_query = text(
+            "UPDATE channel SET view_count = :view_count, subscriber_count = :subscriber_count, video_count = :video_count WHERE channel_id = :channel_id"
+        )
+        update = db.session.execute(
+            update_query,
+            params={
+                "view_count": view_count,
+                "subscriber_count": subscriber_count,
+                "video_count": video_count,
+                "channel_id": channel_id,
+            },
+        )
         db.session.commit()
+
     except Exception as error:
         print(
             f"An error occurred while fetching channel statistics for {channel_id}: {error}"
@@ -61,7 +78,9 @@ def update_channel_statistics_for_user(user_id):
         channel_stats = db.session.execute(
             channel_check_statistics_query, params={"channel_id": channel_id}
         ).fetchone()
-        if not channel_stats:
-            # Fetch and store the missing statistics for the channel.
-            get_channel_statistics(user_id, channel_id)
-            print(user_id, channel_id)
+        if channel_stats and not any(stat is None for stat in channel_stats):
+            # If all stats are present, no need to fetch them again
+            continue
+        print(user_id, channel_id, channel_stats)
+
+        get_channel_statistics(user_id, channel_id)
