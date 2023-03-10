@@ -122,7 +122,7 @@ def oauth2callback():
     # )
     # # rework this
     current_user.update_youtube_credentials(credentials)
-    return redirect(url_for("main.yourpicks"))
+    return redirect(url_for("main.index"))
 
 
 @auth_bp.route("/signup", methods=["GET", "POST"])
