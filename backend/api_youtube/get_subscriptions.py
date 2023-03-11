@@ -1,5 +1,5 @@
 from backend.api_youtube.get_youtube_object import get_youtube_object
-from backend.db_utils import save_channels
+from backend.db_utils import save_user_subscriptions
 
 
 def get_subscriptions(current_user):
@@ -8,6 +8,7 @@ def get_subscriptions(current_user):
     Returns the list of subscription items from a user.
     """
 
+    print("getting subscriptions...")
     subscriptions = []
     next_page_token = None
 
@@ -37,6 +38,5 @@ def get_subscriptions(current_user):
         except Exception as error:
             print(f"An error occurred: {error}")
             return None
-    print(subscriptions)
-    save_channels(subscriptions, current_user.user_id)
+    save_user_subscriptions(subscriptions, current_user)
     return subscriptions

@@ -9,20 +9,24 @@ class Channel(db.Model):
     thumbnail_default_url = db.Column(db.String(255))
     thumbnail_medium_url = db.Column(db.String(255))
     thumbnail_high_url = db.Column(db.String(255))
-    country = db.Column(db.String(2), nullable=True)
-    view_count = db.Column(db.Integer, nullable=True)
-    subscriber_count = db.Column(db.Integer, nullable=True)
-    video_count = db.Column(db.Integer, nullable=True)
+    country = db.Column(db.String(2))
+    view_count = db.Column(db.Integer)
+    subscriber_count = db.Column(db.Integer)
+    video_count = db.Column(db.Integer)
 
     def __repr__(self):
-        return self.title
+        return f"{self.title} - {self.channel_id} - {self.view_count} - {self.subscriber_count} - {self.video_count}"
 
 
-class UserChannel(db.Model):
-    user_channel_id = db.Column(db.Integer, primary_key=True)
+class UserSubscription(db.Model):
+    user_subscription_id = db.Column(db.String(32), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+    username = db.Column(db.String(255))
     channel_id = db.Column(db.String(32), db.ForeignKey("channel.channel_id"))
+    channel_title = db.Column(db.String(255))
     flag_is_visible = db.Column(db.Boolean, default=True)
+    subscribed_at = db.Column(db.DateTime)
+    thumbnail_default_url = db.Column(db.String(255))
 
     def __repr__(self):
-        return f"{self.user_id} - {self.channel_id}"
+        return f"{self.user_id} - {self.user_subscription_id}"

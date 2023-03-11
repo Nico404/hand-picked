@@ -3,8 +3,12 @@
 {% block content %}
 <!-- Sortable JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-<!-- Sortable functon -->
-<!-- <script src="../static/js/list_channels.js" defer></script> -->
+
+<script src=
+"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+    </script>
+<!-- filter onkey  -->
+<script src="../static/js/filter_search_yourpicks.js" defer></script>
 
 <div class="bg-white-100">
     <section class="container mx-auto">
@@ -23,7 +27,7 @@
                                     clip-rule="evenodd"></path>
                             </svg>
                         </div>
-                        <input type="text"
+                        <input id="search_bar" type="text"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="Filter through channels" required>
                     </div>
@@ -35,62 +39,62 @@
                     <div class="-my-2 overflow-x-auto sm:-mx-6 lg:px-8">
                         <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                             <div class="overflow-hidden shadow-md bg-white rounded-lg">
-                                <table class="min-w-full divide-y divide-gray-200">
+                                <table id="yourpicks_table" class="min-w-full divide-y divide-gray-200">
                                     <thead>
                                         <tr>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
                                                 Channel
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
-                                                Subscription Date
+                                                Creation
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
-                                                View Count
+                                                Views
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
                                                 Subscribers
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
-                                                Total Videos
+                                                Videos
                                             </th>
                                         </tr>
                                     </thead>
                                     <!-- Table Body -->
                                     <tbody class="bg-white" id="list_item">
-                                        {% for subscription in subscriptions %}
+                                        {% for channel in channels %}
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-10 w-10">
                                                         <img class="h-10 w-10 rounded-full object-cover"
-                                                            src="{{ subscription.thumbnail_default_url }}"
-                                                            alt="{{ subscription.title }}">
+                                                            src="{{ channel.thumbnail_default_url }}"
+                                                            alt="{{ channel.title }}">
                                                     </div>
                                                     <div class="ml-4">
                                                         <div class="text-sm font-medium text-gray-700 capitalize">
-                                                            {{ subscription.title }}
+                                                            {{ channel.title }}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ subscription.published_at.strftime('%d/%m/%Y') }}
+                                                    {{ channel.published_at.strftime('%d/%m/%Y') }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ subscription.view_count }}
+                                                    {{ "{:,}".format(channel.view_count).replace(',',' ') }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ subscription.subscriber_count}}
+                                                    {{ "{:,}".format(channel.subscriber_count).replace(',',' ') }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ subscription.video_count}}
+                                                    {{ "{:,}".format(channel.video_count).replace(',',' ') }}
                                                 </span>
                                             </td>
                                         </tr>

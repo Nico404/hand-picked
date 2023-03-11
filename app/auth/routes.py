@@ -9,9 +9,6 @@ from google.oauth2.credentials import Credentials
 
 from app.auth.forms import LoginForm, RegistrationForm
 from app.auth.models import User, login_manager
-from backend.api_youtube.get_channel_statistics import (
-    update_channel_statistics_for_user,
-)
 from backend.api_youtube.get_client_secret import get_client_secret
 from backend.database import db
 
@@ -47,21 +44,18 @@ def signin():
             else:
                 return redirect(url_for("auth.authorize"))
 
-        # Call the function to update channel statistics for the user
-        update_channel_statistics_for_user(user.user_id)
-
         return redirect(url_for("main.index"))
     return render_template("signin.html", title="Sign In", form=form)
 
 
-# Load client secrets from a file.
-client_secrets_file = get_client_secret()
-# Define the required scopes
-scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
-
 # define the authorization route
 @auth_bp.route("/authorize")
 def authorize():
+    # Load client secrets from a file.
+    client_secrets_file = get_client_secret()
+    # Define the required scopes
+    scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
+
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -94,6 +88,11 @@ def authorize():
 # define the callback route
 @auth_bp.route("/oauth2callback")
 def oauth2callback():
+    # Load client secrets from a file.
+    client_secrets_file = get_client_secret()
+    # Define the required scopes
+    scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
+
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
