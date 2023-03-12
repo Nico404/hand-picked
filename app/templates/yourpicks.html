@@ -57,6 +57,9 @@
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
                                                 Videos
                                             </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500 sr-only">
+                                                Edit
+                                            </th>
                                         </tr>
                                     </thead>
                                     <!-- Table Body -->
@@ -96,6 +99,9 @@
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
                                                     {{ "{:,}".format(channel.video_count).replace(',',' ') }}
                                                 </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <a href="#" class="font-medium text-green-600 dark:text-green-500 hover:underline">Hide</a>
                                             </td>
                                         </tr>
                                         {% endfor %}

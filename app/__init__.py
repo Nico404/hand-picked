@@ -27,11 +27,6 @@ def create_app(config_class=Config):
     # init login manager
     login_manager.init_app(app)
 
-    # init mail instance
-    # mailgun = MailGun()
-    # mailgun.init_app(app)
-
-    print(Config.MAILGUN_API_KEY)
     # custom cli command to create database
     @app.cli.command("create_database")
     def create_database():

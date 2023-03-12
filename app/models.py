@@ -30,3 +30,17 @@ class UserSubscription(db.Model):
 
     def __repr__(self):
         return f"{self.user_id} - {self.user_subscription_id}"
+
+
+class Video(db.Model):
+    video_id = db.Column(db.String(32), primary_key=True)
+    title = db.Column(db.String(255))
+    description = db.Column(db.String(5000))
+    published_at = db.Column(db.DateTime)
+    thumbnail_default_url = db.Column(db.String(255))
+    view_count = db.Column(db.Integer)
+    category_id = db.Column(db.Integer)
+    channel_id = db.Column(db.String(32), db.ForeignKey("channel.channel_id"))
+
+    def __repr__(self):
+        return f"{self.title} - {self.video_id} - {self.view_count}"

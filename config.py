@@ -14,4 +14,4 @@ class Config:
     # email service
     with open(os.path.join(basedir, "secret/mailgun_apikey.txt"), "r") as apikey:
         MAILGUN_API_KEY = apikey.read()
-    MAILGUN_DOMAIN = "your_mailgun_domain"
+    MAILGUN_DOMAIN = "sandboxfc484fa6e6bf49979b8c7a91f6fc08d9"

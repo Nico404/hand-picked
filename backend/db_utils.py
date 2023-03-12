@@ -1,6 +1,6 @@
 from dateutil.parser import parse
 
-from app.models import Channel, UserSubscription
+from app.models import Channel, UserSubscription, Video
 from backend.database import db
 
 
@@ -61,6 +61,28 @@ def save_user_subscriptions(subscriptions, current_user):  # UCC9mlCpyisiIpp9YA9
                 thumbnail_default_url=subscription["snippet"]["thumbnails"]["default"][
                     "url"
                 ],
+            )
+        db.session.add(new_user_subscription)
+    db.session.commit()
+
+
+def save_videos(videos, current_user):
+    print("saving top10 videos...")
+    for video in videos:
+        # check if the video already exists in the database
+        video_id = video["id"]["videoId"]
+        existing_video = Video.query.filter_by(video_id=video_id).first()
+        if existing_video:
+            new_user_subscription = existing_video
+        else:
+            # create a new UserSubscription object for the current user and channel
+            new_user_subscription = UserSubscription(
+                video_id=video["id"]["videoId"],
+                title=video["snippet"]["title"],
+                view_count=video["snippet"]["viewCount"],
+                category_id=video["snippet"]["categoryId"],
+                link=f"https://www.youtube.com/watch?v={video_id}",
+                channel_id=video["snippet"]["channelId"],
             )
         db.session.add(new_user_subscription)
     db.session.commit()

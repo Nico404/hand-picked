@@ -1,7 +1,54 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
 
-{% block content %}
-<p>INDEX</p>
-<h1>Welcome, {{ current_user.username }}!</h1>
-
+<div class="bg-white-100">
+  <section class="container mx-auto">
+    <section class="p-10 h-screen">
+      <div class="py-2">
+        <div class="flex items-center justify-center mb-6">
+          <span
+            class="bg-green-600 text-white text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300"
+            >Hand-Picked</span
+          >
+        </div>
+        <h2
+          class="mb-2 text-4xl tracking-tight font-extrabold text-center text-green-400 dark:text-green-400"
+        >
+          From Solo to Social...
+        </h2>
+        <h2
+          class="mb-4 text-4xl tracking-tight font-extrabold text-center text-green-600 dark:text-green-600"
+        >
+          Making Youtube a multiplayer experience
+        </h2>
+        <p
+          class="mb-8 lg:mb-8 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl"
+        >
+          Share the curated, hand-picked subscription list you've built with the
+          world. Uncover hidden gems with the help of your friends. Take a trip
+          down memory lane and revisit your entire content history.
+        </p>
+        <div class="flex items-center justify-center">
+          <button
+            class="bg-green-600 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="submit"
+            onclick="window.location.href='/signin'"
+          >
+            Try it out!
+          </button>
+        </div>
+        <div class="flex items-center justify-center mt-10">
+          <iframe
+            style="border-radius: 20px; overflow: hidden; z-index: 1"
+            src="https://www.youtube.com/embed/ZXni9_91ORs?start=0?autoplay=1"
+            frameborder="0"
+            allow="autoplay; fullscreen"
+            width="680"
+            height="360"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </section>
+  </section>
+</div>
 {% endblock %}
