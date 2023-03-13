@@ -13,6 +13,8 @@ class Channel(db.Model):
     view_count = db.Column(db.Integer)
     subscriber_count = db.Column(db.Integer)
     video_count = db.Column(db.Integer)
+    calculated_category = db.Column(db.Integer)
+    flag_fetched_top_videos = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"{self.title} - {self.channel_id} - {self.view_count} - {self.subscriber_count} - {self.video_count}"
@@ -35,12 +37,18 @@ class UserSubscription(db.Model):
 class Video(db.Model):
     video_id = db.Column(db.String(32), primary_key=True)
     title = db.Column(db.String(255))
-    description = db.Column(db.String(5000))
-    published_at = db.Column(db.DateTime)
-    thumbnail_default_url = db.Column(db.String(255))
     view_count = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
+    link = db.Column(db.String(255))
     channel_id = db.Column(db.String(32), db.ForeignKey("channel.channel_id"))
 
     def __repr__(self):
         return f"{self.title} - {self.video_id} - {self.view_count}"
+
+
+class VideoCategory(db.Model):
+    category_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f"{self.category_id} - {self.title}"

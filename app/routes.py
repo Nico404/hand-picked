@@ -1,10 +1,15 @@
+import datetime
+
 from flask import Blueprint, flash, render_template, request
 from flask_login import current_user, login_required
 
-from app.models import Channel, UserSubscription
-from backend.api_youtube.get_channels import get_channels
-from backend.api_youtube.get_subscriptions import get_subscriptions
-from backend.database import db
+from app.repository import (
+    CustomQueryRepository,
+    UserSubscriptionRepository,
+    VideoCategoryRepository,
+    VideoRepository,
+)
+from app.service import ApiService
 from backend.email_management.send_support import send_simple_message
 
 main_bp = Blueprint("main", __name__)
@@ -15,102 +20,85 @@ def index():
     return render_template("index.html", title="Home")
 
 
+@main_bp.route("/dashboard")
+@login_required
+def dashboard():
+    if current_user.is_authenticated and current_user.youtube_credentials:
+        # Initialize repositories
+        customqueryrepository = CustomQueryRepository()
+        videoqueryrepository = VideoRepository()
+        videocategoryrepository = VideoCategoryRepository()
+
+        # Get the top 5 countries of the user's subscriptions
+        top_5_countries = customqueryrepository.get_top_5_countries(
+            current_user.user_id
+        )
+        # Create a list of dictionaries containing the custom data
+        custom_data = [
+            {"label": row.country, "value": row.count} for row in top_5_countries
+        ]
+
+        # Fetch channels in need of categorization and update the calculated category field
+        api_service = ApiService(current_user)
+        api_service.update_channel_calculated_category()
+
+    return render_template("dashboard.html", custom_data=custom_data)
+
+
 @main_bp.route("/yourpicks")
 @login_required
 def yourpicks():
     if current_user.is_authenticated and current_user.youtube_credentials:
-        # Get all the UserSubscription objects that belong to the current user and are visible
-        user_subscription_list = UserSubscription.query.filter_by(
-            user_id=current_user.user_id,
-            flag_is_visible=True,
-        ).all()
-        # Get their channel IDs
-        channel_ids = [
-            user_subscription.channel_id for user_subscription in user_subscription_list
-        ]
-        channel_ids_list = (
-            Channel.query.filter(Channel.channel_id.in_(channel_ids))
-            .order_by(Channel.subscriber_count.desc())
-            .all()
+        # Get all the UserSubscription objects that belong to the current user
+        usersubscriptionrepository = UserSubscriptionRepository()
+        user_subscriptions = (
+            usersubscriptionrepository.get_user_subscription_list_enriched(
+                current_user.user_id
+            )
         )
 
-        # Get the Channel objects based on the channel_ids list
-        channels = (
-            Channel.query.filter(Channel.channel_id.in_(channel_ids))
-            .order_by(Channel.subscriber_count.desc())
-            .all()
-        )
+        # If there are no UserSubscription objects, fetch the user's subscriptions and the channels from the API
+        if len(user_subscriptions) == 0:
+            api_service = ApiService(current_user)
+            user_subscriptions = api_service.get_user_subscriptions()
+            api_service.save_user_subscriptions(user_subscriptions)
+            channel_ids = [
+                user_subscription["snippet"]["resourceId"]["channelId"]
+                for user_subscription in user_subscriptions
+            ]
+            api_service.save_channel(api_service.get_channel(channel_ids))
 
-        # If the user has no UserSubscription yet, get them and the channels associated from YouTube
-        if len(channel_ids_list) == 0:
-            get_subscriptions(current_user)
-
-        # If the channel_list is empty, call the get_channels function
-        if not channels:
-            channels = get_channels(channel_ids, current_user)
-
-    return render_template("yourpicks.html", channels=channels)
+            user_subscriptions = (
+                usersubscriptionrepository.get_user_subscription_list_enriched(
+                    current_user.user_id
+                )
+            )
+    return render_template("yourpicks.html", user_subscriptions=user_subscriptions)
 
 
 @main_bp.route("/yourtimeline")
 @login_required
 def yourtimeline():
     if current_user.is_authenticated and current_user.youtube_credentials:
-        # Get all the UserSubscription objects that belong to the current user and are visible
-        user_subscription_list = (
-            UserSubscription.query.filter_by(
-                user_id=current_user.user_id,
-                flag_is_visible=True,
+        # Initialize repositories
+        usersubscriptionrepository = UserSubscriptionRepository()
+        customqueryrepository = CustomQueryRepository()
+
+        # Get all the UserSubscription objects that belong to the current user
+        user_subscriptions = usersubscriptionrepository.get_user_subscription_list(
+            current_user.user_id
+        )
+        # Get the first subscription's and calculate the difference between the current time and the subscription's time
+        diff_time = customqueryrepository.diff_now_date(
+            usersubscriptionrepository.get_oldest_user_subcription_date(
+                current_user.user_id
             )
-            .order_by(UserSubscription.subscribed_at.asc())
-            .all()
         )
-
-    return render_template("yourtimeline.html", subscriptions=user_subscription_list)
-
-
-@main_bp.route("/dashboard")
-@login_required
-def dashboard():
-
-    # Get the top 5 countries of the user's subscriptions
-    user_id = current_user.user_id
-    query = (
-        db.session.query(
-            Channel.country.label("country"), db.func.count().label("count")
-        )
-        .join(UserSubscription, UserSubscription.channel_id == Channel.channel_id)
-        .filter(UserSubscription.user_id == user_id)
-        .group_by(Channel.country)
-        .filter(Channel.country != "ZZ")  # remove the "unknown" country
-        .order_by(db.func.count().desc())
-        .limit(5)
+    return render_template(
+        "yourtimeline.html",
+        user_subscriptions=user_subscriptions,
+        diff_time=diff_time,
     )
-    query_result = query.all()
-
-    custom_data = []
-    for row in query_result:
-        custom_data.append({"label": row.country, "value": row.count})
-
-    #
-    # Get all the UserSubscription objects that belong to the current user and are visible
-    user_subscription_list = UserSubscription.query.filter_by(
-        user_id=user_id, flag_is_visible=True
-    ).all()
-
-    # Get their channel IDs
-    channel_ids = [
-        user_subscription.channel_id for user_subscription in user_subscription_list
-    ]
-
-    # Get the Channel objects based on the channel_ids list
-    channels = (
-        Channel.query.filter(Channel.channel_id.in_(channel_ids))
-        .order_by(Channel.subscriber_count.desc())
-        .all()
-    )
-
-    return render_template("dashboard.html", custom_data=custom_data)
 
 
 @main_bp.route("/support")

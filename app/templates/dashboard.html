@@ -4,14 +4,10 @@
   <section class="container mx-auto">
     <section class="p-10 h-screen">
       <div class="py-2">
-        <h2
-          class="mb-4 text-4xl tracking-tight font-extrabold text-center text-green-600 dark:text-green-600"
-        >
+        <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-center text-green-600 dark:text-green-600">
           Dashboard
         </h2>
-        <p
-          class="mb-2 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl"
-        >
+        <p class="mb-2 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">
           Let's plot some data shall we ?
         </p>
       </div>
@@ -26,9 +22,20 @@
       <!-- Chart doughnut -->
       <script src="../static/js/doughnut_chart_dashboard.js"></script>
       <script>
-        const customData = {{ custom_data|tojson }};
+        const customData = {{ custom_data | tojson }};
         createDoughnutChart(customData);
       </script>
+
+      <p id="spider_chart"
+        class="mt-20 mb-2 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">
+        There will be another chart here
+      </p>
+      <p> "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
+        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+        laborum."
+      </p>
 
       {% endblock %}
     </section>

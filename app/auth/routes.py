@@ -135,7 +135,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
         flash("Congratulations, you are now a registered user!", "success")
-        return redirect(url_for("auth.signup"))
+        return redirect(url_for("auth.signin"))
     else:
         if request.method == "POST":
             flash("Oh No! Form is not valid", "error")

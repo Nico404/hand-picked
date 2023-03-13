@@ -4,9 +4,8 @@
 <!-- Sortable JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
-<script src=
-"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
-    </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+</script>
 <!-- filter onkey  -->
 <script src="../static/js/filter_search_yourpicks.js" defer></script>
 
@@ -14,8 +13,11 @@
     <section class="container mx-auto">
         <section class="p-10 h-screen">
             <div class="py-2">
-                <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-center text-green-600 dark:text-green-600">Your Picks</h2>
-                <p class="mb-8 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">Curate your list and make your favorite channels rise to the top. Order, add your personal notes to make your friends want to them check out </p>
+                <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-center text-green-600 dark:text-green-600">
+                    Your Picks</h2>
+                <p class="mb-8 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">Curate your
+                    list and make your favorite channels rise to the top. Order, add your personal notes to make your
+                    friends want to them check out </p>
                 <form class="flex items-center pt-5">
                     <label for="voice-search" class="sr-only">Search</label>
                     <div class="relative w-full">
@@ -64,44 +66,58 @@
                                     </thead>
                                     <!-- Table Body -->
                                     <tbody class="bg-white" id="list_item">
-                                        {% for channel in channels %}
+                                        {% for user_subscription in user_subscriptions %}
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-10 w-10">
                                                         <img class="h-10 w-10 rounded-full object-cover"
-                                                            src="{{ channel.thumbnail_default_url }}"
-                                                            alt="{{ channel.title }}">
+                                                            src="{{ user_subscription.thumbnail_default_url }}"
+                                                            alt="{{ user_subscription.title }}">
                                                     </div>
                                                     <div class="ml-4">
                                                         <div class="text-sm font-medium text-gray-700 capitalize">
-                                                            {{ channel.title }}
+                                                            {{ user_subscription.title }}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ channel.published_at.strftime('%d/%m/%Y') }}
+                                                    {{ user_subscription.subscribed_at.strftime('%d/%m/%Y') }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ "{:,}".format(channel.view_count).replace(',',' ') }}
+                                                    {% if user_subscription.view_count is defined %}
+                                                    {{ "{:,}".format(user_subscription.view_count).replace(',',' ') }}
+                                                    {% else %}
+                                                    {{ user_subscription.view_count }}
+                                                    {% endif %}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ "{:,}".format(channel.subscriber_count).replace(',',' ') }}
+                                                    {% if user_subscription.subscriber_count is defined %}
+                                                    {{ "{:,}".format(user_subscription.subscriber_count).replace(',','
+                                                    ') }}
+                                                    {% else %}
+                                                    {{ user_subscription.subscriber_count }}
+                                                    {% endif %}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
-                                                    {{ "{:,}".format(channel.video_count).replace(',',' ') }}
+                                                    {% if user_subscription.video_count is defined %}
+                                                    {{ "{:,}".format(user_subscription.video_count).replace(',',' ') }}
+                                                    {% else %}
+                                                    {{ user_subscription.video_count }}
+                                                    {% endif %}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <a href="#" class="font-medium text-green-600 dark:text-green-500 hover:underline">Hide</a>
+                                                <a href="#"
+                                                    class="font-medium text-green-600 dark:text-green-500 hover:underline">Hide</a>
                                             </td>
                                         </tr>
                                         {% endfor %}

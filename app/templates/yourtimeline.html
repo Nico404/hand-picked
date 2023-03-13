@@ -4,60 +4,45 @@
   <section class="container mx-auto">
     <section class="p-10 h-screen">
       <div class="py-2">
-        <h2
-          class="mb-4 text-4xl tracking-tight font-extrabold text-center text-green-600 dark:text-green-600"
-        >
+        <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-center text-green-600 dark:text-green-600">
           Your Timeline
         </h2>
-        <p
-          class="mb-8 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl"
-        >
+        <p class="mb-8 lg:mb-4 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">
           A brief history of time. This is who you started watching at the
           beginning...
         </p>
+        <p class="mb-8 lg:mb-4 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">
+          Your first subscription was
+          <span class="text-green-600">{{ diff_time }}</span> ago.
+        </p>
       </div>
       <!-- timeline element start here -->
-      <div
-        class="min-h-screen bg-white-100 py-6 flex flex-col justify-center sm:py-12"
-      >
+      <div class="min-h-screen bg-white-100 py-6 flex flex-col justify-center sm:py-12">
         <div class="py-3 sm:max-w-xl sm:mx-auto w-full px-2 sm:px-0">
           <div class="relative text-gray-700 antialiased text-sm font-semibold">
             <!-- Vertical bar running through middle -->
-            <div
-              class="hidden sm:block w-1 bg-green-300 absolute h-full left-1/2 transform -translate-x-1/2"
-            ></div>
+            <div class="hidden sm:block w-1 bg-green-300 absolute h-full left-1/2 transform -translate-x-1/2"></div>
 
             <!-- odd even sections, set by justify-start and sm:pr-8 -->
-            {% for subscription in subscriptions %}
+            {% for user_subscription in user_subscriptions %}
             <div class="mt-6 sm:mt-0 sm:mb-12">
               <div class="flex flex-col sm:flex-row items-center">
                 <div
-                  class="flex w-full mx-auto items-center {{ 'justify-start' if loop.index is odd else 'justify-end' }}"
-                >
-                  <div
-                    class="w-full {{ 'sm:w-1/2 sm:pr-8' if loop.index is odd else 'sm:w-1/2 sm:pl-8' }}"
-                  >
+                  class="flex w-full mx-auto items-center {{ 'justify-start' if loop.index is odd else 'justify-end' }}">
+                  <div class="w-full {{ 'sm:w-1/2 sm:pr-8' if loop.index is odd else 'sm:w-1/2 sm:pl-8' }}">
                     <div class="p-4 bg-white rounded shadow">
-                      <h3
-                        class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"
-                      >
-                        {{ subscription.channel_title }}
+                      <h3 class="flex items-center mb-1 text-lg text-gray-500 dark:text-white">
+                        {{ user_subscription.channel_title }}
                       </h3>
-                      <time
-                        class="block text-sm font-normal leading-none text-gray-400 dark:text-gray-500"
-                        >Subscribed on {{
-                        subscription.subscribed_at.strftime('%d/%m/%Y') }}</time
-                      >
+                      <time class="block text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Subscribed
+                        on {{
+                        user_subscription.subscribed_at.strftime('%d/%m/%Y') }}</time>
                     </div>
                   </div>
                 </div>
                 <div
-                  class="rounded-full bg-blue-500 border-white border-4 w-8 h-8 absolute left-1/2 -translate-y-4 sm:translate-y-0 transform -translate-x-1/2 flex items-center justify-center"
-                >
-                  <img
-                    class="h-6 w-6 rounded-full object-cover"
-                    src="{{ subscription.thumbnail_default_url }}"
-                  />
+                  class="rounded-full bg-blue-500 border-white border-4 w-8 h-8 absolute left-1/2 -translate-y-4 sm:translate-y-0 transform -translate-x-1/2 flex items-center justify-center">
+                  <img class="h-6 w-6 rounded-full object-cover" src="{{ user_subscription.thumbnail_default_url }}" />
                 </div>
               </div>
             </div>
