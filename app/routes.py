@@ -3,14 +3,15 @@ import datetime
 from flask import Blueprint, flash, render_template, request
 from flask_login import current_user, login_required
 
-from app.repository import (
+from backend.email_management.send_support import send_simple_message
+from backend.repository import (
+    ChannelRepository,
     CustomQueryRepository,
     UserSubscriptionRepository,
     VideoCategoryRepository,
     VideoRepository,
 )
-from app.service import ApiService
-from backend.email_management.send_support import send_simple_message
+from backend.service import ApiService
 
 main_bp = Blueprint("main", __name__)
 
@@ -26,8 +27,9 @@ def dashboard():
     if current_user.is_authenticated and current_user.youtube_credentials:
         # Initialize repositories
         customqueryrepository = CustomQueryRepository()
-        videoqueryrepository = VideoRepository()
+        videorepository = VideoRepository()
         videocategoryrepository = VideoCategoryRepository()
+        channelrepository = ChannelRepository()
 
         # Get the top 5 countries of the user's subscriptions
         top_5_countries = customqueryrepository.get_top_5_countries(
@@ -40,6 +42,7 @@ def dashboard():
 
         # Fetch channels in need of categorization and update the calculated category field
         api_service = ApiService(current_user)
+
         api_service.update_channel_calculated_category()
 
     return render_template("dashboard.html", custom_data=custom_data)

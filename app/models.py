@@ -38,9 +38,12 @@ class Video(db.Model):
     video_id = db.Column(db.String(32), primary_key=True)
     title = db.Column(db.String(255))
     view_count = db.Column(db.Integer)
+    like_count = db.Column(db.Integer)
+    comment_count = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
     link = db.Column(db.String(255))
     channel_id = db.Column(db.String(32), db.ForeignKey("channel.channel_id"))
+    published_at = db.Column(db.DateTime)
 
     def __repr__(self):
         return f"{self.title} - {self.video_id} - {self.view_count}"

@@ -7,8 +7,8 @@ from googleapiclient.discovery import build
 
 from app.auth.models import User
 from app.models import Channel, UserSubscription, Video, VideoCategory
-from app.repository import ChannelRepository, VideoRepository
 from backend.database import db
+from backend.repository import ChannelRepository, VideoRepository
 
 
 class ApiService:
@@ -189,7 +189,7 @@ class ApiService:
                 .list(
                     channelId=channel_id,
                     part="id,snippet",
-                    order="rating",
+                    order="viewCount",
                     type="video",
                     maxResults=10,
                 )
@@ -209,24 +209,52 @@ class ApiService:
             video_id = video["id"]["videoId"]
             existing_video = Video.query.filter_by(video_id=video_id).first()
             if existing_video:
-                new_user_subscription = existing_video
+                new_video = existing_video
             else:
                 # create a new UserSubscription object for the current user and channel
-                new_user_subscription = UserSubscription(
+                new_video = Video(
                     video_id=video["id"]["videoId"],
                     title=video["snippet"]["title"],
-                    view_count=video["snippet"]["viewCount"],
-                    category_id=video["snippet"]["categoryId"],
-                    link=f"https://www.youtube.com/watch?v={video_id}",
                     channel_id=video["snippet"]["channelId"],
+                    published_at=parse(video["snippet"]["publishedAt"]),
                 )
-            db.session.add(new_user_subscription)
+            db.session.add(new_video)
         # Update the fetched_top_videos flag for the channel
-        channel = Channel.query.filter_by(
-            channel_id=new_user_subscription.channel_id
-        ).first()
+        channel = Channel.query.filter_by(channel_id=new_video.channel_id).first()
         channel.fetched_top_videos = True  # this set True should be in repository
         db.session.commit()
+
+    def get_video_details(self, video_id):
+        """Retrieves the authenticated client object and fetches the video details for the provided video ID."""
+        print("getting video details...")
+        try:
+            # Call the video method to retrieve the video details
+            video_response = (
+                self.youtube.videos()
+                .list(
+                    part="snippet,statistics",
+                    id=video_id,
+                )
+                .execute()
+            )
+            return video_response["items"]
+        except Exception as error:
+            print(f"An error occurred: {error}")
+            return None
+
+    def update_video_details(self, video):
+        print("updating video details...")
+        # check if the video already exists in the database
+        video_id = video["id"]
+        existing_video = Video.query.filter_by(video_id=video_id).first()
+        if existing_video:
+            existing_video.category_id = video["snippet"]["categoryId"]
+            existing_video.link = f"https://www.youtube.com/watch?v={video_id}"
+            existing_video.view_count = video["statistics"]["viewCount"]
+            existing_video.like_count = video["statistics"]["likeCount"]
+            existing_video.comment_count = video["statistics"]["commentCount"]
+            db.session.commit()
+            self.save(existing_video)
 
     def get_video_categories(self):
         """Retrieves the authenticated client object and fetches the video categories."""
@@ -266,28 +294,39 @@ class ApiService:
         db.session.commit()
 
     def update_channel_calculated_category(self):
-        # First, get channels with no videos fetched
-        videorepository = VideoRepository()
+        # Initialize the repository objects
         channelrepository = ChannelRepository()
+
+        # First, get channels with no videos fetched
         channels = channelrepository.get_channel_list_no_videos()
 
+        # For each channel, get the top 10 videos and update the calculated_category field
         for channel in channels:
-            # Get all videos for the current channel
-            videos = videorepository.get_videos_by_channel_id(channel.id)
+            videos = self.get_top_videos_from_channel(channel.channel_id)
+            self.save_videos(videos)
 
-            # Count the occurrences of each category_id and find the most common one
             category_count = {}
             max_count = 0
             max_category_id = None
+
+            # Get the video details for each video
             for video in videos:
-                category_id = video.category_id
-                if category_id in category_count:
-                    category_count[category_id] += 1
-                else:
-                    category_count[category_id] = 1
-                if category_count[category_id] > max_count:
-                    max_count = category_count[category_id]
-                    max_category_id = category_id
+                video_id = video["id"]
+                video_details = self.get_video_details(video_id)
+                for video_detail in video_details:
+                    self.update_video_details(video_detail)
+                    category_id = video_detail["snippet"]["categoryId"]
+
+                    # Count the occurrences of each category_id
+                    if category_id in category_count:
+                        category_count[category_id] += 1
+                    else:
+                        category_count[category_id] = 1
+
+                    # Find the most common category_id
+                    if category_count[category_id] > max_count:
+                        max_count = category_count[category_id]
+                        max_category_id = category_id
 
             # Update the channel's calculated_category field with the most common category_id
             if max_category_id is not None:

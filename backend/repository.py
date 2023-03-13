@@ -133,30 +133,17 @@ class CustomQueryRepository:
         )  # maybe     query_result = query.all()
         return top_countries
 
-    def update_channel_calculated_category(self):
-        # First, get channels with no videos fetched
-        videorepository = VideoRepository()
-        channels = videorepository.get_channel_list_no_videos()
-
-        for channel in channels:
-            # Get all videos for the current channel
-            videos = videorepository.get_videos_by_channel_id(channel.id)
-
-            # Count the occurrences of each category_id and find the most common one
-            category_count = {}
-            max_count = 0
-            max_category_id = None
-            for video in videos:
-                category_id = video.category_id
-                if category_id in category_count:
-                    category_count[category_id] += 1
-                else:
-                    category_count[category_id] = 1
-                if category_count[category_id] > max_count:
-                    max_count = category_count[category_id]
-                    max_category_id = category_id
-
-            # Update the channel's calculated_category field with the most common category_id
-            if max_category_id is not None:
-                channel.calculated_category = max_category_id
-                self.save(channel)
+    def get_subscription_categories(self, user_id):
+        subscription_categories = (
+            db.session.query(
+                VideoCategory.video_category_id.label("category_id"),
+                VideoCategory.title.label("category_title"),
+                db.func.count().label("count"),
+            )
+            .join(Channel, Channel.video_category_id == VideoCategory.video_category_id)
+            .join(UserSubscription, UserSubscription.channel_id == Channel.channel_id)
+            .filter(UserSubscription.user_id == user_id)
+            .group_by(VideoCategory.video_category_id)
+            .order_by(db.func.count().desc())
+        )
+        return subscription_categories
