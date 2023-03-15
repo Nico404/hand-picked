@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <!-- Sortable JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
@@ -8,6 +9,10 @@
 </script>
 <!-- filter onkey  -->
 <script src="../static/js/filter_search_yourpicks.js" defer></script>
+
+<script src="../static/js/hide_subscription_yourpicks.js"></script>
+
+
 
 <div class="bg-white-100">
     <section class="container mx-auto">
@@ -67,8 +72,13 @@
                                     <!-- Table Body -->
                                     <tbody class="bg-white" id="list_item">
                                         {% for user_subscription in user_subscriptions %}
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                        <tr id="row-{{ user_subscription.user_subscription_id }}"
+                                            class="{{ 'invisible-row' if not user_subscription.flag_is_visible }}">
+                                            <!-- row ID for js selection -->
+                                            <!-- row ID for js selection -->
+                                            <!-- class for onload page -->
+
+                                            <td class=" px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     <div class="flex-shrink-0 h-10 w-10">
                                                         <img class="h-10 w-10 rounded-full object-cover"
@@ -77,7 +87,7 @@
                                                     </div>
                                                     <div class="ml-4">
                                                         <div class="text-sm font-medium text-gray-700 capitalize">
-                                                            {{ user_subscription.title }}
+                                                            {{ user_subscription.channel_title }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -116,8 +126,10 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <a href="#"
-                                                    class="font-medium text-green-600 dark:text-green-500 hover:underline">Hide</a>
+                                                <a href="#" id="hide-link-{{ user_subscription.user_subscription_id }}"
+                                                    class="font-medium text-green-600 dark:text-green-500 hover:underline"
+                                                    onclick="hideChannel(event, this)"
+                                                    data-subscription-id="{{ user_subscription.user_subscription_id }}">Hide</a>
                                             </td>
                                         </tr>
                                         {% endfor %}

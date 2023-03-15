@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 
 import requests
 from dateutil.parser import parse
@@ -191,7 +192,7 @@ class ApiService:
                     part="id,snippet",
                     order="viewCount",
                     type="video",
-                    maxResults=10,
+                    maxResults=5,
                 )
                 .execute()
             )
@@ -227,6 +228,7 @@ class ApiService:
     def get_video_details(self, video_id):
         """Retrieves the authenticated client object and fetches the video details for the provided video ID."""
         print("getting video details...")
+        video_details = []
         try:
             # Call the video method to retrieve the video details
             video_response = (
@@ -237,10 +239,11 @@ class ApiService:
                 )
                 .execute()
             )
-            return video_response["items"]
+            video_details.extend(video_response["items"])
         except Exception as error:
             print(f"An error occurred: {error}")
             return None
+        return video_details
 
     def update_video_details(self, video):
         print("updating video details...")
@@ -253,8 +256,8 @@ class ApiService:
             existing_video.view_count = video["statistics"]["viewCount"]
             existing_video.like_count = video["statistics"]["likeCount"]
             existing_video.comment_count = video["statistics"]["commentCount"]
-            db.session.commit()
-            self.save(existing_video)
+            db.session.add(existing_video)
+        db.session.commit()
 
     def get_video_categories(self):
         """Retrieves the authenticated client object and fetches the video categories."""
@@ -294,6 +297,7 @@ class ApiService:
         db.session.commit()
 
     def update_channel_calculated_category(self):
+
         # Initialize the repository objects
         channelrepository = ChannelRepository()
 
@@ -311,7 +315,7 @@ class ApiService:
 
             # Get the video details for each video
             for video in videos:
-                video_id = video["id"]
+                video_id = video["id"]["videoId"]
                 video_details = self.get_video_details(video_id)
                 for video_detail in video_details:
                     self.update_video_details(video_detail)
@@ -331,4 +335,51 @@ class ApiService:
             # Update the channel's calculated_category field with the most common category_id
             if max_category_id is not None:
                 channel.calculated_category = max_category_id
-                self.save(channel)
+                db.session.commit()
+
+    # def get_channel_sub_counts(self, channel_id, data_point_number):
+    #     """
+    #     Retrieves subscription counts for a channel at specific dates based on the channel's creation date.
+
+    #     Args:
+    #         channel_id (str): The ID of the channel to retrieve subscription counts for.
+    #         data_point_number (int): The number of data points to retrieve.
+
+    #     Returns:
+    #         A list of dictionaries containing the subscription counts for the channel at specific dates.
+    #     """
+    #     # Retrieve the channel's creation date and current subscriber count from the local database.
+    #     # Assuming you have a function to do that called get_channel_info()
+    #     channel_info = get_channel_info(channel_id)
+    #     if not channel_info:
+    #         return None
+
+    #     # Calculate the interval between the channel's creation date and the current date.
+    #     create_date = datetime.fromisoformat(channel_info["create_date"])
+    #     current_sub_count = channel_info["current_sub_count"]
+    #     time_delta = datetime.now() - create_date
+    #     interval = int(time_delta / data_point_number)
+
+    #     # Create a list of dates to retrieve subscription counts for.
+    #     dates = [
+    #         create_date + timedelta(days=interval * i) for i in range(data_point_number)
+    #     ]
+
+    #     # Retrieve the subscription counts for the channel at each date.
+    #     sub_counts = []
+    #     for date in dates:
+    #         # Convert the date to the format expected by the YouTube API.
+    #         formatted_date = date.isoformat() + "Z"
+
+    #         # Call the get_channels() function to retrieve the channel information at the specified date.
+    #         channel_response = self.get_channels([channel_id])
+    #         if not channel_response:
+    #             return None
+
+    #         # Extract the subscription count from the channel information.
+    #         sub_count = channel_response[0]["statistics"]["subscriberCount"]
+
+    #         # Append the subscription count to the list of results.
+    #         sub_counts.append({"date": formatted_date, "subscriber_count": sub_count})
+
+    #     return sub_counts

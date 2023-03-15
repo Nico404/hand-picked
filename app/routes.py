@@ -1,15 +1,13 @@
-import datetime
-
-from flask import Blueprint, flash, render_template, request
+from flask import Blueprint, flash, jsonify, render_template, request
 from flask_login import current_user, login_required
 
+from app.models import UserSubscription
+from backend.database import db
 from backend.email_management.send_support import send_simple_message
 from backend.repository import (
-    ChannelRepository,
     CustomQueryRepository,
     UserSubscriptionRepository,
     VideoCategoryRepository,
-    VideoRepository,
 )
 from backend.service import ApiService
 
@@ -27,9 +25,7 @@ def dashboard():
     if current_user.is_authenticated and current_user.youtube_credentials:
         # Initialize repositories
         customqueryrepository = CustomQueryRepository()
-        videorepository = VideoRepository()
         videocategoryrepository = VideoCategoryRepository()
-        channelrepository = ChannelRepository()
 
         # Get the top 5 countries of the user's subscriptions
         top_5_countries = customqueryrepository.get_top_5_countries(
@@ -40,10 +36,16 @@ def dashboard():
             {"label": row.country, "value": row.count} for row in top_5_countries
         ]
 
-        # Fetch channels in need of categorization and update the calculated category field
-        api_service = ApiService(current_user)
+        # Fetch category reference table
+        video_categories = videocategoryrepository.get_video_category_list()
+        if len(video_categories) == 0:
+            api_service = ApiService(current_user)
+            api_service.save_video_categories(api_service.get_video_categories())
 
-        api_service.update_channel_calculated_category()
+        # # Fetch channels in need of categorization and update the calculated category field
+        # api_service = ApiService(current_user)
+
+        # api_service.update_channel_calculated_category()
 
     return render_template("dashboard.html", custom_data=custom_data)
 
@@ -59,6 +61,7 @@ def yourpicks():
                 current_user.user_id
             )
         )
+        print(user_subscriptions[0])
 
         # If there are no UserSubscription objects, fetch the user's subscriptions and the channels from the API
         if len(user_subscriptions) == 0:
@@ -77,6 +80,26 @@ def yourpicks():
                 )
             )
     return render_template("yourpicks.html", user_subscriptions=user_subscriptions)
+
+
+@main_bp.route("/update_subscription_visibility", methods=["POST"])
+def update_subscription_visibility():
+    print("aaa")
+    user_subscription_id = request.form["user_subscription_id"]
+    visibility = request.form["visibility"]
+    visibility = True if visibility == "true" else False
+
+    print(user_subscription_id, visibility)
+    user_subscription = UserSubscription.query.filter_by(
+        user_subscription_id=user_subscription_id
+    ).first()
+
+    if user_subscription:
+        user_subscription.flag_is_visible = visibility
+        db.session.commit()
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False})
 
 
 @main_bp.route("/yourtimeline")

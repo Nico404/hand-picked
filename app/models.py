@@ -31,7 +31,7 @@ class UserSubscription(db.Model):
     thumbnail_default_url = db.Column(db.String(255))
 
     def __repr__(self):
-        return f"{self.user_id} - {self.user_subscription_id}"
+        return f"{self.user_id} - {self.user_subscription_id} - {self.flag_is_visible}"
 
 
 class Video(db.Model):
