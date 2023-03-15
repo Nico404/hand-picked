@@ -5,6 +5,7 @@ from app.models import UserSubscription
 from backend.database import db
 from backend.email_management.send_support import send_simple_message
 from backend.repository import (
+    ChannelRepository,
     CustomQueryRepository,
     UserSubscriptionRepository,
     VideoCategoryRepository,
@@ -42,20 +43,36 @@ def dashboard():
             api_service = ApiService(current_user)
             api_service.save_video_categories(api_service.get_video_categories())
 
-        # # Fetch channels in need of categorization and update the calculated category field
-        # api_service = ApiService(current_user)
+            # Fetch channels in need of categorization and update the calculated category field
+            # api_service = ApiService(current_user)
+            # api_service.update_channel_calculated_category()
 
-        # api_service.update_channel_calculated_category()
+        print(
+            customqueryrepository.get_subscription_categorie_count(current_user.user_id)
+        )
 
-    return render_template("dashboard.html", custom_data=custom_data)
+        # Get the number of subscriptions per category
+        labels, data = customqueryrepository.get_subscription_categorie_count(
+            current_user.user_id
+        )
+
+    return render_template(
+        "dashboard.html",
+        custom_data=custom_data,
+        labels=labels,
+        data=data,
+        username=current_user.username,
+    )
 
 
 @main_bp.route("/yourpicks")
 @login_required
 def yourpicks():
     if current_user.is_authenticated and current_user.youtube_credentials:
-        # Get all the UserSubscription objects that belong to the current user
         usersubscriptionrepository = UserSubscriptionRepository()
+        channelrepository = ChannelRepository()
+
+        # Get all the UserSubscription objects that belong to the current user
         user_subscriptions = (
             usersubscriptionrepository.get_user_subscription_list_enriched(
                 current_user.user_id
@@ -66,19 +83,63 @@ def yourpicks():
         # If there are no UserSubscription objects, fetch the user's subscriptions and the channels from the API
         if len(user_subscriptions) == 0:
             api_service = ApiService(current_user)
+            # get and save the user's subscriptions from the YouTube API
             user_subscriptions = api_service.get_user_subscriptions()
             api_service.save_user_subscriptions(user_subscriptions)
+
+            # extract the channel IDs from the subscriptions
             channel_ids = [
                 user_subscription["snippet"]["resourceId"]["channelId"]
                 for user_subscription in user_subscriptions
             ]
+            # fetch their channel details from the YouTube API
             api_service.save_channel(api_service.get_channel(channel_ids))
 
+            # get the enriched UserSubscription objects from the database using the current user's ID
             user_subscriptions = (
                 usersubscriptionrepository.get_user_subscription_list_enriched(
                     current_user.user_id
                 )
             )
+
+        elif len(user_subscriptions) > 0:
+            # Get the user's subscriptions
+            user_subscriptions = (
+                usersubscriptionrepository.get_user_subscription_list_enriched(
+                    current_user.user_id
+                )
+            )
+
+            # Fetch the user's subscription list from the API
+            api_service = ApiService(current_user)
+            user_subscriptions_api = api_service.get_user_subscriptions()
+
+            # Create lists to store channel IDs from local and API sources
+            local_channel_ids = [
+                user_subscription.channel_id for user_subscription in user_subscriptions
+            ]
+            api_channel_ids = [
+                user_subscription["snippet"]["resourceId"]["channelId"]
+                for user_subscription in user_subscriptions_api
+            ]
+
+            # Find new channel IDs in the API response
+            new_channel_ids = list(set(api_channel_ids) - set(local_channel_ids))
+
+            # Save the new subscriptions to the local database
+            api_service.save_user_subscriptions(user_subscriptions_api)
+
+            # Fetch the new channel subscriptions
+            new_subscriptions_channel = api_service.get_channel(new_channel_ids)
+            api_service.save_channel(new_subscriptions_channel)
+
+            # get the enriched UserSubscription objects from the database using the current user's ID
+            user_subscriptions = (
+                usersubscriptionrepository.get_user_subscription_list_enriched(
+                    current_user.user_id
+                )
+            )
+
     return render_template("yourpicks.html", user_subscriptions=user_subscriptions)
 
 

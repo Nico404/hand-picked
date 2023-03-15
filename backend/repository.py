@@ -1,5 +1,7 @@
 import datetime
 
+from sqlalchemy import func
+
 from app.auth.models import User
 from app.models import Channel, UserSubscription, Video, VideoCategory
 from backend.database import db
@@ -47,6 +49,7 @@ class UserSubscriptionRepository:
     def __init__(self):
         self.session = db.session
         self.channel_repository = ChannelRepository()
+        self.video_category_repository = VideoCategoryRepository()
 
     def get_user_subscription_list(self, user_id):
         user_subscriptions = (
@@ -64,9 +67,21 @@ class UserSubscriptionRepository:
             channel = self.channel_repository.get_channel(channel_id)
 
             if channel is not None:
+                # fetch the video category list and find the matching category based on the channel's category_id
+                video_categories = (
+                    self.video_category_repository.get_video_category_list()
+                )
+                category_id = channel.calculated_category
+                category = next(
+                    (c for c in video_categories if c.category_id == category_id), None
+                )
+
                 user_subscription.view_count = channel.view_count
                 user_subscription.video_count = channel.video_count
                 user_subscription.subscriber_count = channel.subscriber_count
+                user_subscription.calculated_category = (
+                    category.title if category is not None else None
+                )
 
         return user_subscriptions
 
@@ -133,17 +148,29 @@ class CustomQueryRepository:
         )  # maybe     query_result = query.all()
         return top_countries
 
-    def get_subscription_categories(self, user_id):
-        subscription_categories = (
+    def get_subscription_categorie_count(self, user_id):
+        sub_query = (
             db.session.query(
-                VideoCategory.video_category_id.label("category_id"),
-                VideoCategory.title.label("category_title"),
-                db.func.count().label("count"),
+                UserSubscription.channel_title.label("channel1"),
+                Channel.title.label("channel2"),
+                VideoCategory.title.label("category"),
             )
-            .join(Channel, Channel.video_category_id == VideoCategory.video_category_id)
-            .join(UserSubscription, UserSubscription.channel_id == Channel.channel_id)
+            .join(Channel, Channel.channel_id == UserSubscription.channel_id)
+            .join(
+                VideoCategory, Channel.calculated_category == VideoCategory.category_id
+            )
             .filter(UserSubscription.user_id == user_id)
-            .group_by(VideoCategory.video_category_id)
-            .order_by(db.func.count().desc())
+            .subquery()
         )
-        return subscription_categories
+        query = (
+            db.session.query(
+                sub_query.c.category.label("category"),
+                func.count().label("value"),
+            )
+            .group_by(sub_query.c.category)
+            .order_by(func.count().desc())
+        )
+        result = query.all()
+        labels = [row[0] for row in result]
+        data = [row[1] for row in result]
+        return labels, data

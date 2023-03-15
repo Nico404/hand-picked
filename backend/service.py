@@ -219,10 +219,11 @@ class ApiService:
                     channel_id=video["snippet"]["channelId"],
                     published_at=parse(video["snippet"]["publishedAt"]),
                 )
-            db.session.add(new_video)
-        # Update the fetched_top_videos flag for the channel
-        channel = Channel.query.filter_by(channel_id=new_video.channel_id).first()
-        channel.fetched_top_videos = True  # this set True should be in repository
+                db.session.add(new_video)
+            # Update the fetched_top_videos flag for the channel
+            channel = Channel.query.filter_by(channel_id=new_video.channel_id).first()
+            channel.fetched_top_videos = True  # this set True should be in repository
+
         db.session.commit()
 
     def get_video_details(self, video_id):
@@ -253,9 +254,21 @@ class ApiService:
         if existing_video:
             existing_video.category_id = video["snippet"]["categoryId"]
             existing_video.link = f"https://www.youtube.com/watch?v={video_id}"
-            existing_video.view_count = video["statistics"]["viewCount"]
-            existing_video.like_count = video["statistics"]["likeCount"]
-            existing_video.comment_count = video["statistics"]["commentCount"]
+            existing_video.view_count = 0
+            existing_video.like_count = 0
+            existing_video.comment_count = 0
+            try:
+                existing_video.view_count = video["statistics"]["viewCount"]
+            except KeyError:
+                print(f"No view count for video with ID {video_id}")
+            try:
+                existing_video.like_count = video["statistics"]["likeCount"]
+            except KeyError:
+                print(f"No like count for video with ID {video_id}")
+            try:
+                existing_video.comment_count = video["statistics"]["commentCount"]
+            except KeyError:
+                print(f"No comment count for video with ID {video_id}")
             db.session.add(existing_video)
         db.session.commit()
 

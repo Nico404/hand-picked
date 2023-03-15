@@ -2,6 +2,19 @@
 
 {% block content %}
 
+{% set category_colors = {
+"Autos & Vehicles": "bg-blue-500 text-gray-100",
+"Music": "bg-green-500 text-gray-100",
+"Gaming": "bg-blue-500",
+"People & Blogs": "bg-orange-500 text-gray-100",
+"Entertainment": "bg-violet-500 text-gray-100",
+"News & Politics": "bg-red-500 text-gray-100",
+"Howto & Style": "bg-pink-500 text-gray-100",
+"Science & Technology": "bg-teal-500 text-gray-100",
+"Comedy": "bg-yellow-500 text-gray-100"
+} %}
+
+
 <!-- Sortable JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
@@ -36,7 +49,7 @@
                         </div>
                         <input id="search_bar" type="text"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Filter through channels" required>
+                            placeholder="Filter through channels or categories" required>
                     </div>
 
             </div>
@@ -51,6 +64,9 @@
                                         <tr>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
                                                 Channel
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
+                                                Category
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-left text-md text-gray-500">
                                                 Creation
@@ -91,6 +107,12 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ category_colors[user_subscription.calculated_category] }}">
+                                                    {{ user_subscription.calculated_category }}
+                                                </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="text-sm text-gray-600 leading-5 px-2 inline-flex">
